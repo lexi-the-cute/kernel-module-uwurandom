@@ -6,3 +6,6 @@
 *.cmd
 Module.symvers
 modules.order
+
+uwurandom
+*.log
