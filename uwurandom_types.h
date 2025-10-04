@@ -1,19 +1,26 @@
 #ifndef _UWURANDOM_TYPES_H
 #define _UWURANDOM_TYPES_H
 
+#ifdef __KERNEL__
 #include <linux/types.h>
+
+#else
+#include <stddef.h>
+#include <stdint.h>
+#include <stdbool.h>
+#endif
 
 typedef uint32_t uwu_random_number;
 
 typedef struct uwu_markov_choice uwu_markov_choice;
 struct uwu_markov_choice {
-    size_t next_ngram;
-    uint16_t cumulative_probability;
+    uint8_t next_ngram;
+    uint8_t cumulative_probability;
 };
 
 typedef struct {
-    uwu_markov_choice* choices;
-    uint16_t total_probability;
+    uint16_t choices;
+    uint8_t total_probability;
     char character;
 } uwu_markov_ngram;
 
@@ -22,16 +29,17 @@ typedef void uwu_op_factory(uwu_state* state);
 
 typedef struct {
     uwu_op_factory** specials;
-    ssize_t initial_ngram;
-    size_t num_ngrams;
-    uwu_markov_ngram ngrams[];
+    int32_t initial_ngram;
+    uint32_t num_ngrams;
+    const uwu_markov_choice* choices;
+    const uwu_markov_ngram* ngrams;
 } uwu_markov_table;
 
 // Stores the state for a Markov chain operation.
 typedef struct {
     size_t prev_ngram; /* previous ngram */
     size_t remaining_chars; /* number of remaining characters */
-    uwu_markov_table* ngrams /* ngram table */;
+    const uwu_markov_table* ngrams /* ngram table */;
 } uwu_markov_state;
 
 // Stores the state for a "print string" operation.
@@ -75,11 +83,12 @@ typedef struct {
 
 struct uwu_state {
     uwu_op_factory** ops_table;
-    size_t num_ops;
+    int32_t num_ops;
+    int32_t prev_op;
 
     uwu_op ops[MAX_OPS];
-    ssize_t current_op;
-    int prev_op;
+    int8_t current_op;
+
     uwu_random_number* rng_buf;
     size_t rng_idx;
 };

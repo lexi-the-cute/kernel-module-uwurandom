@@ -4,8 +4,14 @@
 *.mod.c
 .vscode/*
 *.cmd
+uwurandom
+uwurandom.wasm
+libuwurandom.so
 Module.symvers
 modules.order
+*~
 
 uwurandom
 *.log
+.cache
+compile_commands.json
